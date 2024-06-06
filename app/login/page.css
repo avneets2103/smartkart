@@ -1,0 +1,25 @@
+.loginGlass {
+  background-color: rgba(217, 217, 217, 0.1);
+}
+
+@media (max-width: 1060px) {
+  .hide-on-small {
+    display: none;
+  }
+  .hide-on-mobile{
+    margin: 0;
+  }
+
+  .loginGlass{
+    justify-content: space-evenly;
+  }
+}
+
+@media (max-width: 750px) {
+  .hide-on-mobile {
+    display: none;
+  }
+  .loginGlass{
+    justify-content: center;
+  }
+}
