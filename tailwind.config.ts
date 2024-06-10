@@ -117,6 +117,12 @@ const config = {
             transform: "translateY(-50%)",
           },
         },
+        // otp animations
+        "caret-blink": {
+          "0%,70%,100%": { opacity: "1" },
+          "20%,50%": { opacity: "0" },
+        },
+
       },
       animation: {
         // accordian animations
@@ -128,6 +134,8 @@ const config = {
         third: "moveInCircle 40s linear infinite",
         fourth: "moveHorizontal 40s ease infinite",
         fifth: "moveInCircle 20s ease infinite",
+        // otp animations
+        "caret-blink": "caret-blink 1.25s ease-out infinite",
       },
     },
   },

@@ -23,3 +23,28 @@
     justify-content: center;
   }
 }
+
+.otpArea input[type="text"]:first-child {
+  margin-left: 0;
+}
+
+.otpArea input[type="text"]:last-child {
+  margin-right: 0;
+}
+
+.otpArea input[type="text"] {
+  text-align: center !important;
+  padding: 0.5rem 0 !important;
+  width: 20% !important;
+  height: 3rem !important;
+  border-radius: 5px;
+  padding-top: 1rem;
+  margin: 0 3.3%; 
+  background-color: white;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+}
+
+.otpArea input[type="text"]:focus {
+  outline: 2px solid rgba(0, 0, 0, 0.489) !important;
+}
+

@@ -3,9 +3,24 @@ import { BackgroundGradientAnimation } from '@/components/ui/background-gradient
 import './page.css'
 import LoginCard from '../my_components/loginCard/loginCard'
 import DemoCard from '../my_components/loginCard/demoCard'
+import { ToastContainer } from 'react-toastify'
+import "react-toastify/dist/ReactToastify.css";
 
 function Page() {
     return (
+        <>
+        <ToastContainer
+        position="bottom-right"
+        autoClose={4000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+        />
         <div>
             <div className='w-full h-screen z-0 absolute top-0 left-0'>
                 <BackgroundGradientAnimation 
@@ -50,6 +65,7 @@ function Page() {
                     <img src="./icons/QuestionMark.png" alt="questionMark" className='m-[-1rem] min-w-40 w-[35%] hide-on-small'/>                </div> 
             </div>
         </div>
+        </>
     )
 }
 
