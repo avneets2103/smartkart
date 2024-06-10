@@ -75,10 +75,32 @@ const handleVerify = async (OTP:string) => {
   }
 }
 
+const handleForgotPass = (setForgotPass: Function, setOtpPage: Function, setPassword: Function) => {
+  setForgotPass(true);
+  setOtpPage(false);
+  setPassword("");
+}
+
+const handleGenerateNewPassword = async (email: string, setForgotPass: Function, setOTP: Function) => {
+  try {
+    const body = {
+      "email": email
+    }
+    await axios.post(`${BACKEND_URI}/users/generateNewPassword`, body);
+    ToastInfo("New password generated");
+    setForgotPass(false);
+    setOTP(false);
+  } catch (error) {
+    ToastInfo("Email not registered, Sign Up first");
+  }
+}
+
 export { 
     validateEmail, 
     passIsValid, 
     handleLogin,
     handleReset,
-    handleVerify
+    handleVerify,
+    handleForgotPass,
+    handleGenerateNewPassword
 };
