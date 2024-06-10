@@ -1,7 +1,6 @@
 import axios from "axios";
 import { BACKEND_URI, minPassLength, otpLength } from "../CONSTANTS";
 import { ToastErrors, ToastInfo } from "./toastError";
-import { signIn } from "next-auth/react";
 import Cookies from "js-cookie";
 
 const validateEmail = (value: string): boolean => 
@@ -34,10 +33,6 @@ const handleLogin = async(isInvalid: boolean, password: string, email: string, s
         }
     }
 };
-
-const loginWithGoogle = async() => {
-  signIn("google")
-}
 
 const handleReset = async (otpGap: number, time: number, setTime: Function, setOTP: Function) => {
   if (time > 0) {
@@ -84,7 +79,6 @@ export {
     validateEmail, 
     passIsValid, 
     handleLogin,
-    loginWithGoogle,
     handleReset,
     handleVerify
 };
