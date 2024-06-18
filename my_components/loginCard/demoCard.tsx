@@ -8,7 +8,7 @@ function DemoCard() {
                 <div
                 className='
                 text-4xl
-                text-color1
+                text-textColorDark
                 georama-b
                 '
                 >
@@ -16,10 +16,10 @@ function DemoCard() {
                     <p className='text-nowrap'>the way you</p> 
                     <p>shop!</p>
                 </div>
-                <p className='text-xs text-color1'>We help you compare, track and make your shopping experience more fruitful</p>
+                <p className='text-xs text-textColorDark'>We help you compare, track and make your shopping experience more fruitful</p>
             </div>
             <div>
-                <p className='text-xs text-color1'>Wanna know more?</p>
+                <p className='text-xs text-textColorDark'>Wanna know more?</p>
                 <Button 
                 color="default" 
                 variant="bordered"

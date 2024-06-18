@@ -1,8 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import abs from "./features/abs";
+import sidebar from "./features/sidebar";
 
 export const store = configureStore({
   reducer: {
-    abs: abs,
+    sidebar: sidebar,
+    
   },
 });

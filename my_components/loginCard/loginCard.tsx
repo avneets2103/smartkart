@@ -1,13 +1,26 @@
 "use client";
 import React, { useState, useRef, KeyboardEvent, useEffect } from 'react';
 import { Input } from "@nextui-org/react";
-import { minPassLength, otpGap, otpLength } from '@/app/CONSTANTS';
-import { handleLogin, passIsValid, validateEmail, handleReset, handleVerify, handleForgotPass, handleGenerateNewPassword } from '@/app/Helpers/login';
+import { BACKEND_URI, minPassLength, otpGap, otpLength } from '@/CONSTANTS';
 import OtpInput from "react-otp-input";
 import Link from 'next/link';
 import Cookies from "js-cookie";
+import { 
+    handleLogin, 
+    passIsValid, 
+    validateEmail, 
+    handleReset, 
+
+    handleForgotPass, 
+    handleGenerateNewPassword 
+} from '@/Helpers/login';
+import { useRouter } from 'next/navigation';
+import { ToastErrors, ToastInfo } from '@/Helpers/toastError';
+import axios from 'axios';
+import { tokenCookies } from '@/Helpers/cookieHandling';
 
 function LoginCard() {
+    const Router = useRouter();
     // required variables and states
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -70,6 +83,30 @@ function LoginCard() {
           handleForgotPass(setForgotPass, setOtpPage, setPassword)
         }
     };
+    const handleVerify = async (OTP:string) => {
+        if (OTP.length != otpLength) {
+            ToastErrors("OTP too small");
+            return;
+        }else{
+            const verifyBody = {
+                "email": Cookies.get("email") || "",
+                "enteredOTP": OTP,
+            }
+            try {
+                const res = await axios.post(
+                    `${BACKEND_URI}/users/verifyOTP`, 
+                    verifyBody
+                );
+                tokenCookies(res.data.data.accessToken, res.data.data.refreshToken);
+                console.log(res.data.data.accessToken);
+                console.log(res.data.data.refreshToken);
+                ToastInfo("OTP verified");
+                Router.push("/sections/myCart");
+            } catch (error) {
+                ToastErrors("Invalid OTP");
+            }
+        }
+    }
     
     // returning component based on OTP status
     if(!otpPage && !forgotPass){
@@ -206,7 +243,7 @@ function LoginCard() {
                     <Link
                     href="/login"
                     onClick={()=>{handleGenerateNewPassword(email, setForgotPass, setOtpPage)}} 
-                    className={"text-[13px] text-black decoration-solid "}
+                    className={"text-[13px] text-textColorLight decoration-solid "}
                     >
                     Change password
                     </Link>

@@ -1,19 +1,20 @@
 import {createSlice} from '@reduxjs/toolkit';
+import { sidebarRTK } from '@/Interfaces';
 
 // this are the globally required variables, and this object is called a state
-const initialState = {
-    // key: value
+const initialState:sidebarRTK = {
+    currentPage: 'myCart',
 }
 
 export const slice = createSlice({
   name: `slice`,
   initialState,
   reducers: {
-    functionName: (state, action) => {
-      // some function which is gonna be avalaible and has direct access to the initialState
+    setCurrentPage: (state, action) => {
+        state.currentPage = action.payload.currentPage;
     }
   }
 })
 
-export const {functionName} = slice.actions
+export const {setCurrentPage} = slice.actions
 export default slice.reducer

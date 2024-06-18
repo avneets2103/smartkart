@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BACKEND_URI, minPassLength, otpLength } from "../CONSTANTS";
+import { BACKEND_URI, minPassLength, otpLength } from "@/CONSTANTS";
 import { ToastErrors, ToastInfo } from "./toastError";
 import Cookies from "js-cookie";
 
@@ -18,7 +18,7 @@ const handleLogin = async(isInvalid: boolean, password: string, email: string, s
                 password: password,
             };
             const loginRes = await axios.post(`${BACKEND_URI}/users/registerLogin`, user); 
-            console.log(loginRes.data);
+            Cookies.set("avatarNumber", loginRes.data.data.user.avatarNumber, { expires: 60 * 60 * 24 * 30 });
             setOtpPage(true);
           } catch (error: any) {
             ToastErrors("Invalid Login Credentials!");
@@ -54,27 +54,6 @@ const handleReset = async (otpGap: number, time: number, setTime: Function, setO
   setOTP("");
 };
 
-const handleVerify = async (OTP:string) => {
-  if (OTP.length != otpLength) {
-      ToastErrors("OTP too small");
-      return;
-  }else{
-      const verifyBody = {
-          "email": Cookies.get("email") || "",
-          "enteredOTP": OTP,
-      }
-      try {
-          const res = await axios.post(
-              `${BACKEND_URI}/users/verifyOTP`, 
-              verifyBody
-          );
-          ToastInfo("OTP verified");
-      } catch (error) {
-          ToastErrors("Invalid OTP");
-      }
-  }
-}
-
 const handleForgotPass = (setForgotPass: Function, setOtpPage: Function, setPassword: Function) => {
   setForgotPass(true);
   setOtpPage(false);
@@ -100,7 +79,6 @@ export {
     passIsValid, 
     handleLogin,
     handleReset,
-    handleVerify,
     handleForgotPass,
     handleGenerateNewPassword
 };

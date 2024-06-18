@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ReduxProvider } from "./RTK/provider";
+import { ReduxProvider } from "@/RTK/provider";
 import {NextUIProvider} from "@nextui-org/react";
+import { ThemeProvider } from "next-themes";
 
 export const metadata: Metadata = {
   title: "smartKart",
@@ -15,12 +16,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-        
           <body>
           <NextUIProvider>
-            <ReduxProvider>           
-                {children}
-            </ReduxProvider>
+            <ThemeProvider enableSystem={true} attribute="class"> 
+              <ReduxProvider>           
+                  {children}
+              </ReduxProvider>
+            </ThemeProvider>
           </NextUIProvider>
           </body>
       </html>

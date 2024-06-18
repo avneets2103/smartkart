@@ -7,6 +7,7 @@ const {nextui} = require("@nextui-org/react");
 const config = {
   darkMode: ["class"],
   content: [
+    "./my_components/**/*.{ts,tsx}",
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
@@ -27,6 +28,13 @@ const config = {
         'ourDropShadow': '0px 8px 6px rgba(0, 0, 0, 0.25)',  
       },
       colors: {
+        fixedPrimaryColor: "var(--fixed-primary-color)",
+        fixedSecondaryColor: "var(--fixed-secondary-color)",
+        fixedBgColor: "var(--fixed-bg-color)",
+        fixedTextColorLight: "var(--fixed-text-color-light)",
+        fixedColor1: "var(--fixed-color-1)",
+        fixedColor2: "var(--fixed-color-2)",
+        fixedTextColorDark: "var(--fixed-text-color-dark)",
         primaryColor: "var(--primary-color)",
         secondaryColor: "var(--secondary-color)",
         bgColor: "var(--bg-color)",
