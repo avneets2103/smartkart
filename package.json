@@ -17,6 +17,7 @@
     "axios": "^1.7.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "emoji-picker-react": "^4.10.0",
     "express-session": "^1.18.0",
     "framer-motion": "^11.2.10",
     "input-otp": "^1.2.4",

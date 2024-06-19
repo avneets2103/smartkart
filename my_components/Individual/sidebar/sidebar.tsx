@@ -41,8 +41,9 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     const updatedList = [...listArray];
     updatedList.sort((a, b) => b.lastUpdatedAt.getTime() - a.lastUpdatedAt.getTime());
-    setListArray(updatedList);
-    if(listArray.length > 0) {setSelectedKeys(new Set([listArray[0].key]));}
+    // TODO: Fix this
+    // setListArray(updatedList);
+    // if(listArray.length > 0) {setSelectedKeys(new Set([listArray[0].key]));}
   }, [listArray]);
 
   const [newListInfo, setNewListInfo] = useState({
@@ -232,6 +233,7 @@ const Sidebar: React.FC = () => {
                   className="flex h-[2.8rem] w-[2.8rem] flex-col items-center justify-center rounded-[50%] bg-color1"
                   onClick={() => {
                     dispatcher(setCurrentPage({ currentPage: item.path }));
+                    console.log(item.path);
                     Router.push(`/sections/${item.path}`);
                   }}
                 >
