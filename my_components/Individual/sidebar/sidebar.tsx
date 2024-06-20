@@ -20,6 +20,14 @@ import {
   Input,
 } from "@nextui-org/react";
 import EmojiPicker from "emoji-picker-react";
+import { handleAddList } from "@/Helpers/sidebar";
+
+interface listItem {
+  emoji: string;
+  key: string;
+  name: string;
+  budget: string;
+}
 
 const Sidebar: React.FC = () => {
   const dispatcher = useDispatch();
@@ -28,37 +36,24 @@ const Sidebar: React.FC = () => {
   const { theme, setTheme } = useTheme();
   const [selectedKeys, setSelectedKeys] = useState(new Set<string>([""]));
   const [showPopover, setShowPopover] = useState(false);
+  const [listNameEntered, setListNameEntered] = useState(true);
 
-  interface listItem {
-    emoji: string;
-    key: string;
-    name: string;
-    lastUpdatedAt: Date;
-  }
   const options: listItem[] = [
   ];
   const [listArray, setListArray] = useState(options);
-  useEffect(() => {
-    const updatedList = [...listArray];
-    updatedList.sort((a, b) => b.lastUpdatedAt.getTime() - a.lastUpdatedAt.getTime());
-    // TODO: Fix this
-    // setListArray(updatedList);
-    // if(listArray.length > 0) {setSelectedKeys(new Set([listArray[0].key]));}
-  }, [listArray]);
-
   const [newListInfo, setNewListInfo] = useState({
+    key: "",
     name: "",
     emoji: "",
     budget: "",
   });
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  const handleAddList = () => {
-    setNewListInfo({ name: "", emoji: "", budget: "" });
-    listArray.push({ emoji: newListInfo.emoji, key: newListInfo.name, name: newListInfo.name, lastUpdatedAt: new Date() });
-    setListArray([...listArray]); // Trigger re-render
-    setShowPopover(false); // Close the popover
-  };
+  useEffect(() => {
+    if(newListInfo.name !== ""){
+      setListNameEntered(true);
+    }
+  }, [newListInfo.name]);
 
   return (
     <div className="flex h-screen w-[6rem] items-center justify-center">
@@ -103,6 +98,10 @@ const Sidebar: React.FC = () => {
                     </p>
                     <div className="mt-2 flex w-full flex-col gap-2">
                       <Input
+                        isInvalid={!listNameEntered}
+                        errorMessage="Please enter List Name"
+                        isClearable
+                        labelPlacement="inside"
                         value={newListInfo.name}
                         onChange={(e) =>
                           setNewListInfo({
@@ -115,6 +114,7 @@ const Sidebar: React.FC = () => {
                         variant="bordered"
                       />
                       <Input
+                        type="number"
                         value={newListInfo.budget}
                         onChange={(e) =>
                           setNewListInfo({
@@ -161,7 +161,7 @@ const Sidebar: React.FC = () => {
                           color="default"
                           size="lg"
                           className="width-3/4"
-                          onClick={handleAddList}
+                          onClick={()=>handleAddList(newListInfo, setNewListInfo, setListNameEntered, setListArray, setSelectedKeys, setShowPopover, listArray)}
                         >
                           Add your List
                         </Button>
