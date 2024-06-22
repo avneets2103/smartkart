@@ -1,5 +1,6 @@
 interface sidebarRTK { 
     currentPage: string,
+    currentList: string,
 };
 
 interface sidebarMenuItems {

@@ -4,32 +4,26 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Georama:ital,wght@0,100..900;1,100..900&display=swap');
 
-.georama-l {
-  font-family: "Georama", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 200;
-  font-style: normal;
+/* Define the variable font */
+@font-face {
+  font-family: 'Georama';
+  src: url('../public/Fonts/Georama/Georama-VariableFont_wdth\,wght.ttf') format('truetype');
+  font-weight: 100 900; 
+  font-stretch: 50% 200%; 
 }
 
-.georama-r {
-  font-family: "Georama", sans-serif;
-  font-optical-sizing: auto;
+/* Define a static font as fallback */
+@font-face {
+  font-family: 'Georama';
+  src: url('../public/Fonts/Georama/static/Georama-Regular.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
 
-.georama-m {
-  font-family: "Georama", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 600;
-  font-style: normal;
-}
-
-.georama-b {
-  font-family: "Georama", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 800;
-  font-style: normal;
+body {
+  font-family: 'Georama', sans-serif;
+  font-weight: 400;
+  font-stretch: 100%;
 }
 
 @layer base {

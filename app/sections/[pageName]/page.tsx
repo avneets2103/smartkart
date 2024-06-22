@@ -2,10 +2,11 @@
 import { setCurrentPage } from '@/RTK/features/sidebar';
 import Sidebar from '@/my_components/Individual/sidebar/sidebar'
 import React, { useEffect } from 'react'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import './page.css'
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
+import MyCartMain from '@/my_components/myCartMain/myCartMain';
 
 function Page({ params }: any) {
     const dispatcher = useDispatch();
@@ -15,7 +16,7 @@ function Page({ params }: any) {
     });
 
     return (
-        <div className='w-full h-screen bg-bgColor'>
+        <div className='w-full h-screen bg-bgColor flex'>
         <ToastContainer
         position="bottom-right"
         autoClose={4000}
@@ -28,7 +29,8 @@ function Page({ params }: any) {
         pauseOnHover
         theme="colored"
         />
-        <Sidebar/>
+            <Sidebar/>
+            <MyCartMain/>
         </div>
     )
 }

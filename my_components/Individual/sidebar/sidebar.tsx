@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { sidebarMenu } from "@/CONSTANTS";
+import { BACKEND_URI, sidebarMenu } from "@/CONSTANTS";
 import { sidebarMenuItems } from "@/Interfaces";
-import { setCurrentPage } from "@/RTK/features/sidebar";
+import { setCurrentList, setCurrentPage } from "@/RTK/features/sidebar";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import Cookies from "js-cookie";
@@ -20,7 +20,9 @@ import {
   Input,
 } from "@nextui-org/react";
 import EmojiPicker from "emoji-picker-react";
-import { handleAddList } from "@/Helpers/sidebar";
+import { handleAddList, getListArray } from "@/Helpers/sidebar";
+import {Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Checkbox, Link} from "@nextui-org/react";
+import { logout } from "@/Helpers/logout";
 
 interface listItem {
   emoji: string;
@@ -37,6 +39,7 @@ const Sidebar: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState(new Set<string>([""]));
   const [showPopover, setShowPopover] = useState(false);
   const [listNameEntered, setListNameEntered] = useState(true);
+  const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
   const options: listItem[] = [
   ];
@@ -54,6 +57,9 @@ const Sidebar: React.FC = () => {
       setListNameEntered(true);
     }
   }, [newListInfo.name]);
+  useEffect(() => {
+    getListArray(setListArray, setSelectedKeys, dispatcher);
+  }, []);
 
   return (
     <div className="flex h-screen w-[6rem] items-center justify-center">
@@ -161,7 +167,7 @@ const Sidebar: React.FC = () => {
                           color="default"
                           size="lg"
                           className="width-3/4"
-                          onClick={()=>handleAddList(newListInfo, setNewListInfo, setListNameEntered, setListArray, setSelectedKeys, setShowPopover, listArray)}
+                          onClick={()=>handleAddList(newListInfo, setNewListInfo, setListNameEntered, setListArray, setSelectedKeys, setShowPopover, listArray, dispatcher)}
                         >
                           Add your List
                         </Button>
@@ -196,6 +202,7 @@ const Sidebar: React.FC = () => {
                     startContent={
                       <span>{option.emoji}</span>
                     }
+                    onClick={()=>{dispatcher(setCurrentList({ currentList: option.key }))}}
                   >
                     {option.name}
                   </DropdownItem>
@@ -204,9 +211,9 @@ const Sidebar: React.FC = () => {
             </Dropdown>
             <img
               src={
-                theme === "light"
-                  ? "../icons/lightMode.png"
-                  : "../icons/darkMode.png"
+                theme === "dark"
+                  ? "../icons/darkMode.png"
+                  : "../icons/lightMode.png"
               }
               alt="Theme"
               className="w-[40%]"
@@ -244,7 +251,7 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
         <div className="flex w-full flex-col items-center justify-center rounded-[25px] bg-color1 py-[0.2rem] drop-shadow-md">
-          <div className="flex h-[2.8rem] w-[2.8rem] flex-col items-center justify-center rounded-[50%] bg-color1">
+          <div className="flex h-[2.8rem] w-[2.8rem] flex-col items-center justify-center rounded-[50%] bg-color1" onClick={onOpen}>
             <img
               src={"../icons/setting.NS.png"}
               alt={"settings"}
@@ -260,6 +267,30 @@ const Sidebar: React.FC = () => {
           </div>
         </div>
       </div>
+      <Modal 
+        isOpen={isOpen} 
+        onOpenChange={onOpenChange}
+        placement="top-center"
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Settings</ModalHeader>
+              <ModalBody>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="flat" onPress={async()=>{
+                  logout();
+                  onClose();
+                  Router.push("/login");
+                }}>
+                  Logout
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };
