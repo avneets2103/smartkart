@@ -2,7 +2,9 @@ import {createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
     customized: 0,
-    searchString: ""
+    searchString: "",
+    filterStateData: {},
+    utilityStateData: {},
 }
 
 export const cart = createSlice({
@@ -14,9 +16,15 @@ export const cart = createSlice({
     },
     setSearchString: (state, action) => {
       state.searchString = action.payload
+    },
+    setFilterStateData: (state, action) => {
+      state.filterStateData = action.payload
+    },
+    setUtilityStateData: (state, action) => {
+      state.utilityStateData = action.payload
     }
   }
 })
 
-export const {setCustomized, setSearchString} = cart.actions
+export const {setCustomized, setSearchString, setFilterStateData, setUtilityStateData} = cart.actions;
 export default cart.reducer
