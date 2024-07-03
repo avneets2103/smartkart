@@ -6,6 +6,8 @@ import { Input } from "@nextui-org/input";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Button } from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
 import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
+import axios from "@/utils/axios";
+import { BACKEND_URI } from "@/CONSTANTS";
 
 interface CustomField {
   key: string;
@@ -21,6 +23,7 @@ interface Column {
 }
 
 function CartTop() {
+  const listId = useSelector((state: any) => state.sidebar.currentList);
   const dispatcher = useDispatch();
   const selectedTab = useSelector((state: any) => state.cart.customized);
   const [searchValue, setSearchValue] = useState("");
@@ -149,7 +152,7 @@ function CartTop() {
   ];
 
   return (
-    <div className="width-[100%] my-4 mx-4 flex h-[7%] cursor-pointer items-center font-medium justify-between">
+    <div className="width-[100%] my-4 flex h-[7%] cursor-pointer items-center font-medium justify-between">
       <div className="flex gap-4">
         <SectionDisplay />
         <div className="flex items-center rounded-[10px] bg-color1">
@@ -420,8 +423,14 @@ function CartTop() {
                 <ModalFooter>
                   {addProductModalIsOpen && 
                     <>
-                      <Button color="danger" variant="flat" onPress={() => {
+                      <Button color="danger" variant="flat" onPress={async () => {
                         // TODO: The backend webscraping logic should be added here
+                        const addProductRes = await axios.post(BACKEND_URI + "/list/addProductToList", {
+                          listId: listId,
+                          productLink: productLink,
+                          customFields: customFields,
+                        });
+                        console.log(addProductRes);
                         setCustomFields([]);
                         setKey("");
                         setValue("");

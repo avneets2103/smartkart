@@ -62,7 +62,7 @@ const Sidebar: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex h-screen w-[6rem] items-center justify-center">
+    <div className="flex h-screen w-[6rem] items-center justify-center min-w-[6rem]">
       <div className="flex h-full w-[3rem] flex-col justify-between gap-[2rem] py-[1rem]">
         <div className="flex flex-col items-center justify-center gap-[0.7rem]">
           <div>
