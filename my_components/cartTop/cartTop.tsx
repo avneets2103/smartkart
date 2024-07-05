@@ -1,13 +1,31 @@
 import React, { useEffect, useState, useRef } from "react";
 import SectionDisplay from "../Individual/sectionDisplay/sectionDisplay";
 import { useDispatch, useSelector } from "react-redux";
-import { setCustomized, setFilterStateData, setSearchString, setUtilityStateData } from "@/RTK/features/cart";
+import {
+  setColumns,
+  setCustomized,
+  setFilterStateData,
+  setOptions,
+  setProductData,
+  setSearchString,
+  setUtilityStateData,
+} from "@/RTK/features/cart";
 import { Input } from "@nextui-org/input";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Button } from "@nextui-org/react";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Button,
+} from "@nextui-org/react";
 import { Select, SelectItem } from "@nextui-org/react";
-import {Popover, PopoverTrigger, PopoverContent} from "@nextui-org/popover";
+import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/popover";
 import axios from "@/utils/axios";
 import { BACKEND_URI } from "@/CONSTANTS";
+import { ToastErrors, ToastInfo } from "@/Helpers/toastError";
+import { CircularProgress } from "@nextui-org/react";
 
 interface CustomField {
   key: string;
@@ -37,6 +55,7 @@ function CartTop() {
   const [utiltyModalIsOpen, setUtilityModalIsOpen] = useState(false);
   const [filterData, setFilterData] = useState<{ [key: string]: any }>({});
   const [utilityData, setUtilityData] = useState<{ [key: string]: any }>({});
+  const [loading, setLoading] = useState(false);
 
   const keyInputRef = useRef<HTMLInputElement>(null);
   const valueInputRef = useRef<HTMLInputElement>(null);
@@ -50,8 +69,8 @@ function CartTop() {
   const handleAddField = () => {
     const newField = { key, value };
 
-    setCustomFields(prevFields => {
-      const fieldIndex = prevFields.findIndex(field => field.key === key);
+    setCustomFields((prevFields) => {
+      const fieldIndex = prevFields.findIndex((field) => field.key === key);
 
       if (fieldIndex !== -1) {
         const updatedFields = [...prevFields];
@@ -69,8 +88,10 @@ function CartTop() {
   };
 
   const handleRemoveField = (indexToRemove: number) => {
-    setCustomFields(prevFields => {
-      const updatedFields = prevFields.filter((_, index) => index !== indexToRemove);
+    setCustomFields((prevFields) => {
+      const updatedFields = prevFields.filter(
+        (_, index) => index !== indexToRemove,
+      );
       return updatedFields;
     });
   };
@@ -86,16 +107,16 @@ function CartTop() {
   };
 
   const handleFilterChange = (colId: string, listId: string, value: any) => {
-    setFilterData(prevData => ({
+    setFilterData((prevData) => ({
       ...prevData,
-      [listId+"_"+colId]: value,
+      [listId + "_" + colId]: value,
     }));
   };
 
-  const handleUtilityChange = (colId: string,listId: string, value: any) => {
-    setUtilityData(prevData => ({
+  const handleUtilityChange = (colId: string, listId: string, value: any) => {
+    setUtilityData((prevData) => ({
       ...prevData,
-      [listId+"_"+colId]: value,
+      [listId + "_" + colId]: value,
     }));
   };
 
@@ -148,11 +169,11 @@ function CartTop() {
       name: "Display size",
       type: "number",
       range: [1.3, 2.5],
-    }
+    },
   ];
 
   return (
-    <div className="width-[100%] my-4 flex h-[7%] cursor-pointer items-center font-medium justify-between">
+    <div className="width-[100%] my-4 flex h-[7%] cursor-pointer items-center justify-between font-medium">
       <div className="flex gap-4">
         <SectionDisplay />
         <div className="flex items-center rounded-[10px] bg-color1">
@@ -182,7 +203,7 @@ function CartTop() {
           </div>
         </div>
       </div>
-      <div className="flex gap-2 h-[7vh] items-end">
+      <div className="flex h-[7vh] items-end gap-2">
         <Input
           isClearable
           radius="sm"
@@ -195,33 +216,47 @@ function CartTop() {
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
+            if (e.key === "Enter") {
               dispatcher(setSearchString(searchValue));
             }
           }}
         />
         <div className="flex items-center gap-2">
-          {selectedTab ? <div className="bg-secondaryColor rounded-md flex items-center justify-center text-primaryColor py-[0.4rem] px-4" onClick={() => {
-            onOpen();
-            setUtilityModalIsOpen(true);
-            setAddProductModalIsOpen(false);
-            setFilterModalIsOpen(false);
-          }}
-          >Utility</div> : <></>}
-          <div className="bg-secondaryColor w-9 h-9 rounded-full flex items-center justify-center" onClick={() => {
-            onOpen();
-            setAddProductModalIsOpen(true);
-            setFilterModalIsOpen(false);
-            setUtilityModalIsOpen(false);
-          }}>
+          {selectedTab ? (
+            <div
+              className="flex items-center justify-center rounded-md bg-secondaryColor px-4 py-[0.4rem] text-primaryColor"
+              onClick={() => {
+                onOpen();
+                setUtilityModalIsOpen(true);
+                setAddProductModalIsOpen(false);
+                setFilterModalIsOpen(false);
+              }}
+            >
+              Utility
+            </div>
+          ) : (
+            <></>
+          )}
+          <div
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-secondaryColor"
+            onClick={() => {
+              onOpen();
+              setAddProductModalIsOpen(true);
+              setFilterModalIsOpen(false);
+              setUtilityModalIsOpen(false);
+            }}
+          >
             <img src="../icons/additionH.png" className="w-[15px]" alt="logo" />
           </div>
-          <div className="bg-secondaryColor w-9 h-9 rounded-full flex items-center justify-center" onClick={() => {
-            onOpen();
-            setFilterModalIsOpen(true);
-            setAddProductModalIsOpen(false);
-            setUtilityModalIsOpen(false);
-          }}>
+          <div
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-secondaryColor"
+            onClick={() => {
+              onOpen();
+              setFilterModalIsOpen(true);
+              setAddProductModalIsOpen(false);
+              setUtilityModalIsOpen(false);
+            }}
+          >
             <img src="../icons/filterH.png" className="w-[15px]" alt="logo" />
           </div>
         </div>
@@ -233,238 +268,418 @@ function CartTop() {
           <ModalContent>
             {(onClose) => (
               <>
-                <ModalHeader className="flex flex-col gap-1 font-medium items-center justify-center">{getModalHeader()}</ModalHeader>
+                <ModalHeader className="flex flex-col items-center justify-center gap-1 font-medium">
+                  {getModalHeader()}
+                </ModalHeader>
                 <ModalBody>
-                  {addProductModalIsOpen && 
+                  {(loading && (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <CircularProgress aria-label="Loading..." color="danger" />
+                    </div>
+                  )) || (
                     <>
-                      <Input
-                        isClearable
-                        radius="sm"
-                        placeholder="Enter product link"
-                        startContent={
-                          <div>
-                            <img src="../icons/web.png" className="w-[15px]" alt="logo" />
-                          </div>
-                        }
-                        value={productLink}
-                        onChange={(e) => setProductLink(e.target.value)}
-                      />
-                      <p>Add Custom fields</p>
-                      <div className="flex gap-2">
-                        <Input
-                          ref={keyInputRef}
-                          isClearable
-                          radius="sm"
-                          placeholder="Key"
-                          value={key}
-                          onChange={(e) => setKey(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              valueInputRef.current?.focus();
+                      {addProductModalIsOpen && (
+                        <>
+                          <Input
+                            isClearable
+                            radius="sm"
+                            placeholder="Enter product link"
+                            startContent={
+                              <div>
+                                <img
+                                  src="../icons/web.png"
+                                  className="w-[15px]"
+                                  alt="logo"
+                                />
+                              </div>
                             }
-                          }}
-                        />
-                        <Input
-                          ref={valueInputRef}
-                          isClearable
-                          radius="sm"
-                          placeholder="Value"
-                          value={value}
-                          onChange={(e) => setValue(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              handleAddField();
-                            }
-                          }}
-                        />
-                        <Button color="primary" variant="flat" className="min-w-4" onClick={handleAddField}>
-                          <img src="../icons/additionH.png" alt="add" className="w-[20px]" />
-                        </Button>
-                      </div>
-                      <div className="max-h-[25vh] flex flex-col gap-2 overflow-auto">
-                        {customFields.map((field, index) => (
-                          <div className="flex gap-2" key={index}>
+                            value={productLink}
+                            onChange={(e) => setProductLink(e.target.value)}
+                          />
+                          <p>Add Custom fields</p>
+                          <div className="flex gap-2">
                             <Input
-                              disabled
+                              ref={keyInputRef}
+                              isClearable
                               radius="sm"
                               placeholder="Key"
-                              value={field.key}
+                              value={key}
+                              onChange={(e) => setKey(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  valueInputRef.current?.focus();
+                                }
+                              }}
                             />
                             <Input
-                              disabled
+                              ref={valueInputRef}
+                              isClearable
                               radius="sm"
                               placeholder="Value"
-                              value={field.value}
+                              value={value}
+                              onChange={(e) => setValue(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  handleAddField();
+                                }
+                              }}
                             />
-                            <Button color="primary" variant="flat" className="min-w-4" onClick={() => handleRemoveField(index)}>
-                              <img src="../icons/minus.png" alt="remove" className="w-[20px]" />
+                            <Button
+                              color="primary"
+                              variant="flat"
+                              className="min-w-4"
+                              onClick={handleAddField}
+                            >
+                              <img
+                                src="../icons/additionH.png"
+                                alt="add"
+                                className="w-[20px]"
+                              />
                             </Button>
                           </div>
-                        ))}
-                      </div>
-                    </>
-                  }
-                  {filterModalIsOpen && 
-                    <>
-                      <div className="flex flex-col gap-3 overflow-auto max-h-[50vh]">
-                        {cols.map((col) => {
-                          if (col.type === "number") {
-                            return (
-                              <div className="flex flex-col gap-1" key={col.colId}>
-                                <p className="text-sm text-textColorLight px-1">{`${col.name}: In cart [${col.range[0]} to ${col.range[1]}]`}</p>
-                                <div className="flex gap-2">
-                                  <Input
-                                    type="number"
-                                    onWheel={(e) => e.preventDefault()}
-                                    radius="sm"
-                                    placeholder={"From"}
-                                    value={filterData[col.listId + "_" + col.colId]?.from || ""}
-                                    onChange={(e) => handleFilterChange(col.colId,col.listId, { ...filterData[col.listId + "_" + col.colId], from: e.target.value })}
+                          <div className="flex max-h-[25vh] flex-col gap-2 overflow-auto">
+                            {customFields.map((field, index) => (
+                              <div className="flex gap-2" key={index}>
+                                <Input
+                                  disabled
+                                  radius="sm"
+                                  placeholder="Key"
+                                  value={field.key}
+                                />
+                                <Input
+                                  disabled
+                                  radius="sm"
+                                  placeholder="Value"
+                                  value={field.value}
+                                />
+                                <Button
+                                  color="primary"
+                                  variant="flat"
+                                  className="min-w-4"
+                                  onClick={() => handleRemoveField(index)}
+                                >
+                                  <img
+                                    src="../icons/minus.png"
+                                    alt="remove"
+                                    className="w-[20px]"
                                   />
-                                  <Input
-                                    type="number"
-                                    onWheel={(e) => e.preventDefault()}
-                                    radius="sm"
-                                    placeholder={"To"}
-                                    value={filterData[col.listId + "_" + col.colId]?.to || ""}
-                                    onChange={(e) => handleFilterChange(col.colId, col.listId,{ ...filterData[col.listId + "_" + col.colId], to: e.target.value })}
-                                  />
-                                </div>
+                                </Button>
                               </div>
-                            )
-                          }
-                          if (col.type === "string") {
-                            return (
-                              <div className="flex flex-col gap-1" key={col.colId}>
-                                <p className="text-sm text-textColorLight px-1">{col.name}</p>
-                                <div className="flex gap-2">
-                                  <Select
-                                    placeholder={`Select ${col.name}`}
-                                    radius="sm"
-                                    selectionMode="multiple"
-                                    className="max-full"
-                                    selectedKeys={filterData[col.listId + "_" + col.colId] || []}
-                                    onSelectionChange={(selected) => handleFilterChange(col.colId, col.listId, selected)}
+                            ))}
+                          </div>
+                        </>
+                      )}
+                      {filterModalIsOpen && (
+                        <>
+                          <div className="flex max-h-[50vh] flex-col gap-3 overflow-auto">
+                            {cols.map((col) => {
+                              if (col.type === "number") {
+                                return (
+                                  <div
+                                    className="flex flex-col gap-1"
+                                    key={col.colId}
                                   >
-                                    {col.range.map((option) => (
-                                      <SelectItem key={`${col.colId}-${option}`} value={option}>
-                                        {option}
-                                      </SelectItem>
-                                    ))}
-                                  </Select>
-                                </div>
-                              </div>
-                            )
-                          }
-                          return (<></>)
-                        })}
-                      </div>
+                                    <p className="px-1 text-sm text-textColorLight">{`${col.name}: In cart [${col.range[0]} to ${col.range[1]}]`}</p>
+                                    <div className="flex gap-2">
+                                      <Input
+                                        type="number"
+                                        onWheel={(e) => e.preventDefault()}
+                                        radius="sm"
+                                        placeholder={"From"}
+                                        value={
+                                          filterData[
+                                            col.listId + "_" + col.colId
+                                          ]?.from || ""
+                                        }
+                                        onChange={(e) =>
+                                          handleFilterChange(
+                                            col.colId,
+                                            col.listId,
+                                            {
+                                              ...filterData[
+                                                col.listId + "_" + col.colId
+                                              ],
+                                              from: e.target.value,
+                                            },
+                                          )
+                                        }
+                                      />
+                                      <Input
+                                        type="number"
+                                        onWheel={(e) => e.preventDefault()}
+                                        radius="sm"
+                                        placeholder={"To"}
+                                        value={
+                                          filterData[
+                                            col.listId + "_" + col.colId
+                                          ]?.to || ""
+                                        }
+                                        onChange={(e) =>
+                                          handleFilterChange(
+                                            col.colId,
+                                            col.listId,
+                                            {
+                                              ...filterData[
+                                                col.listId + "_" + col.colId
+                                              ],
+                                              to: e.target.value,
+                                            },
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              if (col.type === "string") {
+                                return (
+                                  <div
+                                    className="flex flex-col gap-1"
+                                    key={col.colId}
+                                  >
+                                    <p className="px-1 text-sm text-textColorLight">
+                                      {col.name}
+                                    </p>
+                                    <div className="flex gap-2">
+                                      <Select
+                                        placeholder={`Select ${col.name}`}
+                                        radius="sm"
+                                        selectionMode="multiple"
+                                        className="max-full"
+                                        selectedKeys={
+                                          filterData[
+                                            col.listId + "_" + col.colId
+                                          ] || []
+                                        }
+                                        onSelectionChange={(selected) =>
+                                          handleFilterChange(
+                                            col.colId,
+                                            col.listId,
+                                            selected,
+                                          )
+                                        }
+                                      >
+                                        {col.range.map((option) => (
+                                          <SelectItem
+                                            key={`${col.colId}-${option}`}
+                                            value={option}
+                                          >
+                                            {option}
+                                          </SelectItem>
+                                        ))}
+                                      </Select>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return <></>;
+                            })}
+                          </div>
+                        </>
+                      )}
+                      {utiltyModalIsOpen && (
+                        <>
+                          <div className="flex max-h-[50vh] flex-col gap-3 overflow-auto">
+                            {cols.map((col) => {
+                              if (col.type === "number") {
+                                return (
+                                  <div
+                                    className="flex flex-col gap-1"
+                                    key={col.colId}
+                                  >
+                                    <p className="px-1 text-sm text-textColorLight">{`${col.name}`}</p>
+                                    <div className="flex gap-2">
+                                      <Input
+                                        type="number"
+                                        onWheel={(e) => e.preventDefault()}
+                                        radius="sm"
+                                        placeholder={
+                                          "Enter utlity per unit " + col.name
+                                        }
+                                        value={
+                                          utilityData[
+                                            col.listId + "_" + col.colId
+                                          ]?.ulility || ""
+                                        }
+                                        onChange={(e) =>
+                                          handleUtilityChange(
+                                            col.colId,
+                                            col.listId,
+                                            {
+                                              ...utilityData[
+                                                col.listId + "_" + col.colId
+                                              ],
+                                              ulility: e.target.value,
+                                            },
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              if (col.type === "string") {
+                                return (
+                                  <div
+                                    className="flex flex-col gap-1"
+                                    key={col.colId}
+                                  >
+                                    <p className="px-1 text-sm text-textColorLight">
+                                      {col.name}
+                                    </p>
+                                    <div className="flex gap-2">
+                                      <Popover
+                                        placement="right-start"
+                                        showArrow
+                                        offset={10}
+                                      >
+                                        <PopoverTrigger>
+                                          <Button
+                                            color="primary"
+                                            variant="flat"
+                                            className="min-w-[50%]"
+                                          >{`Set ${col.name} utilities`}</Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-[240px]">
+                                          {(titleProps) => (
+                                            <div className="w-full px-1 py-2">
+                                              <div className="mt-2 flex max-h-[20vh] w-full flex-col gap-2 overflow-auto">
+                                                {col.range.map((option) => (
+                                                  <Input
+                                                    type="number"
+                                                    onWheel={(e) =>
+                                                      e.preventDefault()
+                                                    }
+                                                    radius="sm"
+                                                    label={option}
+                                                    value={
+                                                      utilityData[
+                                                        col.listId +
+                                                          "_" +
+                                                          col.colId
+                                                      ]?.ulility?.[option] || ""
+                                                    }
+                                                    onChange={(e) =>
+                                                      handleUtilityChange(
+                                                        col.colId,
+                                                        col.listId,
+                                                        {
+                                                          ...utilityData[
+                                                            col.listId +
+                                                              "_" +
+                                                              col.colId
+                                                          ],
+                                                          ulility: {
+                                                            ...utilityData[
+                                                              col.listId +
+                                                                "_" +
+                                                                col.colId
+                                                            ]?.ulility,
+                                                            [option]:
+                                                              e.target.value,
+                                                          },
+                                                        },
+                                                      )
+                                                    }
+                                                  />
+                                                ))}
+                                              </div>
+                                            </div>
+                                          )}
+                                        </PopoverContent>
+                                      </Popover>
+                                    </div>
+                                  </div>
+                                );
+                              }
+                              return <></>;
+                            })}
+                          </div>
+                        </>
+                      )}
                     </>
-                  }
-                  {utiltyModalIsOpen && 
-                    <>
-                      <div className="flex flex-col gap-3 overflow-auto max-h-[50vh]">
-                        {cols.map((col) => {
-                          if (col.type === "number") {
-                            return (
-                              <div className="flex flex-col gap-1" key={col.colId}>
-                                <p className="text-sm text-textColorLight px-1">{`${col.name}`}</p>
-                                <div className="flex gap-2">
-                                  <Input
-                                    type="number"
-                                    onWheel={(e) => e.preventDefault()}
-                                    radius="sm"
-                                    placeholder={"Enter utlity per unit "+col.name}
-                                    value = {utilityData[col.listId + "_" + col.colId]?.ulility || ""}
-                                    onChange={(e) => handleUtilityChange(col.colId, col.listId, { ...utilityData[col.listId + "_" + col.colId], ulility: e.target.value })}
-                                  />
-                                </div>
-                              </div>
-                            )
-                          }
-                          if (col.type === "string") {
-                            return (
-                              <div className="flex flex-col gap-1" key={col.colId}>
-                                <p className="text-sm text-textColorLight px-1">{col.name}</p>
-                                <div className="flex gap-2">
-                                <Popover placement="right-start" showArrow offset={10}>
-                                  <PopoverTrigger>
-                                    <Button color="primary" variant="flat" className="min-w-[50%]">{`Set ${col.name} utilities`}</Button>
-                                  </PopoverTrigger>
-                                  <PopoverContent className="w-[240px]">
-                                    {(titleProps) => (
-                                      <div className="px-1 py-2 w-full">
-                                        <div className="mt-2 flex flex-col gap-2 w-full max-h-[20vh] overflow-auto">
-                                          {col.range.map((option) => (
-                                            <Input
-                                              type="number"
-                                              onWheel={(e) => e.preventDefault()}
-                                              radius="sm"
-                                              label={option}
-                                              value={utilityData[col.listId + "_" + col.colId]?.ulility?.[option] || ""}
-                                              onChange={(e) => handleUtilityChange(col.colId, col.listId, { ...utilityData[col.listId + "_" + col.colId], ulility: { ...utilityData[col.listId + "_" + col.colId]?.ulility, [option]: e.target.value } })}
-                                            />
-                                          ))}
-                                        </div>
-                                      </div>
-                                    )}
-                                  </PopoverContent>
-                                </Popover>
-                                </div>
-                              </div>
-                            )
-                          }
-                          return (<></>)
-                        })}
-                      </div>
-                    </>
-                  }
+                  )}
                 </ModalBody>
                 <ModalFooter>
-                  {addProductModalIsOpen && 
+                  {addProductModalIsOpen && (
                     <>
-                      <Button color="danger" variant="flat" onPress={async () => {
-                        // TODO: The backend webscraping logic should be added here
-                        const addProductRes = await axios.post(BACKEND_URI + "/list/addProductToList", {
-                          listId: listId,
-                          productLink: productLink,
-                          customFields: customFields,
-                        });
-                        console.log(addProductRes);
-                        setCustomFields([]);
-                        setKey("");
-                        setValue("");
-                        setProductLink("");
-                        onClose();
-                      }}>
+                      <Button
+                        color="danger"
+                        variant="flat"
+                        onPress={async () => {
+                          try {
+                            setLoading(true);
+                            const addProductRes = await axios.post(
+                              BACKEND_URI + "/list/addProductToList",
+                              {
+                                listId: listId,
+                                productLink: productLink,
+                                customFields: customFields,
+                              },
+                            );
+                            setCustomFields([]);
+                            setKey("");
+                            setValue("");
+                            setProductLink("");
+                            ToastInfo("Product added to cart");
+                            const loadCart = async () => {
+                              const cartRes = await axios.post(`${BACKEND_URI}/list/getListData`, {
+                                listId: listId,
+                              });
+                              if (cartRes.data.statusCode !== 200) {
+                                return;
+                              }
+                              dispatcher(setProductData(cartRes.data.data.products));
+                              dispatcher(setColumns(cartRes.data.data.columns));
+                              dispatcher(setOptions(cartRes.data.data.options));
+                            };
+                            if(listId && listId!=""){
+                              loadCart();
+                            }
+                            onClose();
+                          } catch (e) {
+                            ToastErrors("Add product to cart failed");
+                          } finally {
+                            setLoading(false);
+                          }
+                        }}
+                      >
                         Add to cart
                       </Button>
                     </>
-                  }
-                  {filterModalIsOpen && 
+                  )}
+                  {filterModalIsOpen && (
                     <>
-                      <Button color="danger" variant="flat" onPress={() => {
-                        // TODO: Filter application logic should be added here
-                        console.log(filterData);
-                        dispatcher(setFilterStateData(filterData));
-                        onClose();
-                      }}>
+                      <Button
+                        color="danger"
+                        variant="flat"
+                        onPress={() => {
+                          // TODO: Filter application logic should be added here
+                          console.log(filterData);
+                          dispatcher(setFilterStateData(filterData));
+                          onClose();
+                        }}
+                      >
                         Apply filter
                       </Button>
                     </>
-                  }
-                  {utiltyModalIsOpen && 
+                  )}
+                  {utiltyModalIsOpen && (
                     <>
-                      <Button color="danger" variant="flat" onPress={() => {
-                        // TODO: Utility application logic should be added here
-                        console.log(utilityData);
-                        dispatcher(setUtilityStateData(utilityData));
-                        onClose();
-                      }}>
+                      <Button
+                        color="danger"
+                        variant="flat"
+                        onPress={() => {
+                          // TODO: Utility application logic should be added here
+                          console.log(utilityData);
+                          dispatcher(setUtilityStateData(utilityData));
+                          onClose();
+                        }}
+                      >
                         Apply utility
                       </Button>
                     </>
-                  }
+                  )}
                 </ModalFooter>
               </>
             )}

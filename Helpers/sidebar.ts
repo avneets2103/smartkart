@@ -43,8 +43,10 @@ const getListArray = async (setListArray: Function, setSelectedKeys: Function, d
     return;
   }
   setListArray(listRes.data.data.listArray);
-  setSelectedKeys(new Set([listRes.data.data.listArray[0].key]));
-  dispatcher(setCurrentList({ currentList: listRes.data.data.listArray[0].key }));
+  if(listRes.data.data.listArray.length > 0){
+    setSelectedKeys(new Set([listRes.data.data.listArray[0].key]));
+    dispatcher(setCurrentList({ currentList: listRes.data.data.listArray[0].key }));
+  }
 };
 
 const generateUniqueKey = () => {

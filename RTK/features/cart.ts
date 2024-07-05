@@ -5,6 +5,9 @@ const initialState = {
     searchString: "",
     filterStateData: {},
     utilityStateData: {},
+    productData: [],
+    columns: [],
+    options: {},
 }
 
 export const cart = createSlice({
@@ -22,9 +25,18 @@ export const cart = createSlice({
     },
     setUtilityStateData: (state, action) => {
       state.utilityStateData = action.payload
-    }
-  }
+    },
+    setProductData: (state, action) => {
+      state.productData = action.payload
+    },
+    setColumns: (state, action) => {
+      state.columns = action.payload
+    },
+    setOptions: (state, action) => {
+      state.options = action.payload
+    },
+  },
 })
 
-export const {setCustomized, setSearchString, setFilterStateData, setUtilityStateData} = cart.actions;
+export const {setCustomized, setSearchString, setFilterStateData, setUtilityStateData, setProductData, setColumns, setOptions} = cart.actions;
 export default cart.reducer
