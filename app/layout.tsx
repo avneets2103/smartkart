@@ -3,6 +3,7 @@ import "./globals.css";
 import { ReduxProvider } from "@/RTK/provider";
 import {NextUIProvider} from "@nextui-org/react";
 import { ThemeProvider } from "next-themes";
+import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   title: "smartKart",
@@ -21,6 +22,7 @@ export default function RootLayout({
             <ThemeProvider enableSystem={true} attribute="class"> 
               <ReduxProvider>           
                   {children}
+                  <Analytics />
               </ReduxProvider>
             </ThemeProvider>
           </NextUIProvider>
