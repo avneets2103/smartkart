@@ -146,10 +146,10 @@ function CartHero() {
     }
     // Update Rows based on Redux state
     if (productData && productData.length > 0) {
-      let newRows = [];
+      let newRows:Array<{}> = [];
       productData.forEach((product: {}) => {
         const productFeature = product?.features || {};
-        let newRow = {};
+        let newRow:{} = {};
         newRow["key"] = product?.key || "";
         Object.keys(productFeature).forEach((key) => {
           newRow[key] = productFeature[key];
