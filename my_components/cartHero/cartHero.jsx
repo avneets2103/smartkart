@@ -47,10 +47,10 @@ function CartHero() {
   const [Cols, setCols] = useState(initialColumns);
   const [Rows, setRows] = useState<Array<{}>>([]);
   const dispatcher = useDispatch();
-  const currentList = useSelector((state:any) => state.sidebar.currentList);
-  const cols = useSelector((state:any) => state.cart.columns);
-  const opts = useSelector((state:any) => state.cart.options);
-  const productData = useSelector((state:any) => state.cart.productData);
+  const currentList = useSelector((state) => state.sidebar.currentList);
+  const cols = useSelector((state) => state.cart.columns);
+  const opts = useSelector((state) => state.cart.options);
+  const productData = useSelector((state) => state.cart.productData);
 
   useEffect(() => {
     const loadCart = async () => {
@@ -74,7 +74,7 @@ function CartHero() {
   useEffect(() => {
     // Update Cols based on Redux state
     if (cols && cols.length > 0) {
-      let newCols = cols.map((col:string) => {
+      let newCols = cols.map((col) => {
         let label = col;
         switch (col) {
           case "images":
@@ -146,10 +146,10 @@ function CartHero() {
     }
     // Update Rows based on Redux state
     if (productData && productData.length > 0) {
-      let newRows:Array<{}> = [];
-      productData.forEach((product: {}) => {
+      let newRows = [];
+      productData.forEach((product) => {
         const productFeature = product?.features || {};
-        let newRow:{} = {};
+        let newRow = {};
         newRow["key"] = product?.key || "";
         Object.keys(productFeature).forEach((key) => {
           newRow[key] = productFeature[key];
@@ -209,7 +209,7 @@ function CartHero() {
     onLoadMore: list.loadMore,
   });
 
-  const tableCellImage = (item:string, columnKey:string) => {
+  const tableCellImage = (item, columnKey) => {
     if (columnKey !== "images"){
       if(item && item?.length>50) return item.substring(0,50)+"...";
       if(columnKey === "availability_stock") return item?"In Stock":"Out of Stock";
