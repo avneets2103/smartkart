@@ -10,7 +10,6 @@ import {
     passIsValid, 
     validateEmail, 
     handleReset, 
-
     handleForgotPass, 
     handleGenerateNewPassword 
 } from '@/Helpers/login';

@@ -9,7 +9,7 @@ export function ToastErrors(message: string) {
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
-    theme: "colored",
+    theme: "dark",
   });
 }
 
@@ -22,6 +22,19 @@ export function ToastInfo(message: string) {
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
-    theme: "colored",
+    theme: "dark",
+  });
+}
+
+export function Toast(message: string) {
+  toast(message, {
+    position: "bottom-right",
+    autoClose: 4000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "dark",
   });
 }
