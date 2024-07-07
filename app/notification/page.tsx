@@ -36,7 +36,7 @@ export default function Notifications() {
     } catch (error:AxiosError | any) {
       console.log(error);
       if(error.response.data.message === "User already exists in waitlist" ){
-        ToastInfo("User already exists in waitlist");
+        Toast("🎊 You are already in the waitlist");
       }else{
         ToastErrors("Something went wrong");
       }
