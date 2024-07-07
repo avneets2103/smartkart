@@ -119,7 +119,7 @@ export default function Notifications() {
                       The app is currently in making, so you can sign up for the waitlist. You will be the first ones to have full access to the application, and also review it to give us your recommendations too. 
                       We will be sending you a mail when the app is ready, containing the link to the app, and your password to access all the features.
                       You can refer to this Demo video to see the app in action for now.
-                      <Link href="/https://www.youtube.com/watch?v=0VKE8xLhPmk" target="_blank" className="text-textColorDark">
+                      <Link href="https://www.youtube.com/watch?v=0VKE8xLhPmk" target="_blank" className="text-textColorDark">
                        View Demo here
                       </Link>
                     </>
