@@ -7,7 +7,7 @@ import { Analytics } from '@vercel/analytics/react';
 
 export const metadata: Metadata = {
   title: "smartKart",
-  description: "ADD DESCRIPTION HERE",
+  description: "Making your shopping decisions smarter!",
 };
 
 export default function RootLayout({
