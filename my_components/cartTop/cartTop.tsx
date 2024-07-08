@@ -23,7 +23,7 @@ import {
 import { Select, SelectItem } from "@nextui-org/react";
 import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/popover";
 import axios from "@/utils/axios";
-import { BACKEND_URI } from "@/CONSTANTS";
+import { BACKEND_URI, RENDER_BACKEND_URI } from "@/CONSTANTS";
 import { ToastErrors, ToastInfo } from "@/Helpers/toastError";
 import { CircularProgress } from "@nextui-org/react";
 
@@ -610,7 +610,7 @@ function CartTop() {
                           try {
                             setLoading(true);
                             const addProductRes = await axios.post(
-                              BACKEND_URI + "/list/addProductToList",
+                              RENDER_BACKEND_URI + "/list/addProductToList",
                               {
                                 listId: listId,
                                 productLink: productLink,
