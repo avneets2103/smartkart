@@ -17,6 +17,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { WAITLIST_URI } from "@/CONSTANTS";
 import axios, { AxiosError } from "axios";
+import { LinkPreview } from "@/components/ui/link-preview";
 
 export default function Notifications() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -92,7 +93,7 @@ export default function Notifications() {
             color="danger"
             onClick={addToWaitlist}
             >
-              Let's Do it
+              Add me to waitlist
             </Button>
           </div>
           <div className="flex justify-end text-center items-center text-sm text-neutral-500 mt-[-10px] z-10 relative">
@@ -119,9 +120,12 @@ export default function Notifications() {
                       The app is currently in making, so you can sign up for the waitlist. You will be the first ones to have full access to the application, and also review it to give us your recommendations too. 
                       We will be sending you a mail when the app is ready, containing the link to the app, and your password to access all the features.
                       You can refer to this Demo video to see the app in action for now.
-                      <Link href="https://www.youtube.com/watch?v=0VKE8xLhPmk" target="_blank" className="text-textColorDark">
-                       View Demo here
-                      </Link>
+                      <LinkPreview
+                        url="https://www.youtube.com/watch?v=0VKE8xLhPmk"
+                        className="font-medium bg-clip-text text-transparent bg-gradient-to-br from-purple-500 to-pink-500"
+                      >
+                        Demo Video here
+                      </LinkPreview>
                     </>
                 </ModalBody>
                 <ModalFooter>
