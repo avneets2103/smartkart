@@ -7,11 +7,18 @@ import './page.css'
 import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import MyCartMain from '@/my_components/myCartMain/myCartMain';
+import axios from '@/utils/axios';
+import { RENDER_BACKEND_URI } from '@/CONSTANTS';
 
 function Page({ params }: any) {
     const dispatcher = useDispatch();
     const currentPage = params.pageName;
     useEffect(() => {
+        try {
+            // Verify access token
+            const accessTokenResponse = axios.post(`${RENDER_BACKEND_URI}/users/verifyAccessToken`);
+          } catch (error) {
+          }
         dispatcher(setCurrentPage({currentPage: currentPage}));
     });
 
