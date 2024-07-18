@@ -26,6 +26,7 @@ import axios from "@/utils/axios";
 import { BACKEND_URI, RENDER_BACKEND_URI } from "@/CONSTANTS";
 import { ToastErrors, ToastInfo } from "@/Helpers/toastError";
 import { CircularProgress } from "@nextui-org/react";
+import usePreventScroll from '@/Helpers/stopScrollingInput';
 
 interface CustomField {
   key: string;
@@ -36,15 +37,46 @@ interface Column {
   listId: string;
   colId: string;
   name: string;
-  type: "number" | "string";
-  range: number[] | string[];
+  type: "string" | "number";
+  utilityVal: number;
+  range: Array<{
+    value: string|number;
+    utility: number;
+  }>;
 }
 
+interface StateColumn {
+  key: string;
+  label: string;
+  listId: string;
+  type: "string" | "number";
+  utilityVal: number;
+  range: Array<{
+    value: string|number;
+    utility: number;
+  }>;
+}
+
+const cols: Column[] = [
+  {
+    listId: "watch",
+    colId: "price",
+    name: "Price",
+    type: "number",
+    range: [{value: 400, utility: 0}, {value: 5000, utility: 0}],
+    utilityVal: 0,
+  },
+];
+
 function CartTop() {
+  const inputRef = useRef<HTMLInputElement>(null);
+  usePreventScroll(inputRef);
+  const stateCols = useSelector((state: any) => state.cart.columns);
+  const [Cols, setCols] = useState<Column[]>(cols);
   const listId = useSelector((state: any) => state.sidebar.currentList);
   const dispatcher = useDispatch();
   const selectedTab = useSelector((state: any) => state.cart.customized);
-  const [searchValue, setSearchValue] = useState("");
+  const searchValue = useSelector((state: any) => state.cart.searchString);
   const [productLink, setProductLink] = useState("");
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
@@ -58,13 +90,25 @@ function CartTop() {
   const [loading, setLoading] = useState(false);
 
   const keyInputRef = useRef<HTMLInputElement>(null);
-  const valueInputRef = useRef<HTMLInputElement>(null);
+  const valueInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (searchValue === "") {
-      dispatcher(setSearchString(searchValue));
-    }
-  }, [searchValue]);
+    let newCols: Column[] = [];
+    stateCols.forEach((col:StateColumn) => {
+      if(col.key !== "images"){
+        const newCol = {
+          listId: col.listId,
+          colId: col.key,
+          name: col.label,
+          type: col.type,
+          range: col.range,
+          utilityVal: col.utilityVal,
+        }
+        newCols.push(newCol);
+      }
+    });
+    setCols(newCols);
+  }, [stateCols]);
 
   const handleAddField = () => {
     const newField = { key, value };
@@ -107,10 +151,20 @@ function CartTop() {
   };
 
   const handleFilterChange = (colId: string, listId: string, value: any) => {
-    setFilterData((prevData) => ({
-      ...prevData,
-      [listId + "_" + colId]: value,
-    }));
+    console.log("value", value);
+    if(value.from || value.to){
+      setFilterData((prevData) => ({
+        ...prevData,
+        [listId + "_" + colId]: value,
+      }));
+    }
+    else{
+      setFilterData((prevData) => ({
+        ...prevData,
+        [listId + "_" + colId]: [...value],
+      }));
+    }
+    console.log(filterData);
   };
 
   const handleUtilityChange = (colId: string, listId: string, value: any) => {
@@ -120,57 +174,6 @@ function CartTop() {
     }));
   };
 
-  const cols: Column[] = [
-    {
-      listId: "watch",
-      colId: "price",
-      name: "Price",
-      type: "number",
-      range: [400, 5000],
-    },
-    {
-      listId: "watch",
-      colId: "warranty",
-      name: "Warranty",
-      type: "number",
-      range: [0, 4],
-    },
-    {
-      listId: "watch",
-      colId: "rating",
-      name: "Rating",
-      type: "number",
-      range: [0, 5],
-    },
-    {
-      listId: "watch",
-      colId: "color",
-      name: "Color",
-      type: "string",
-      range: ["Red", "Blue", "Green", "Yellow", "Orange"],
-    },
-    {
-      listId: "watch",
-      colId: "ip",
-      name: "IP Rating",
-      type: "string",
-      range: ["IPX4", "IPX6", "IPX7", "IPX8", "IPX9"],
-    },
-    {
-      listId: "watch",
-      colId: "brand",
-      name: "Brand",
-      type: "string",
-      range: ["Apple", "Samsung", "LG", "Huawei", "Xiaomi"],
-    },
-    {
-      listId: "watch",
-      colId: "display",
-      name: "Display size",
-      type: "number",
-      range: [1.3, 2.5],
-    },
-  ];
 
   return (
     <div className="width-[100%] my-4 flex h-[7%] cursor-pointer items-center justify-between font-medium">
@@ -205,6 +208,7 @@ function CartTop() {
       </div>
       <div className="flex h-[7vh] items-end gap-2">
         <Input
+          ref={inputRef}
           isClearable
           radius="sm"
           placeholder="Search anything"
@@ -214,12 +218,7 @@ function CartTop() {
             </div>
           }
           value={searchValue}
-          onChange={(e) => setSearchValue(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              dispatcher(setSearchString(searchValue));
-            }
-          }}
+          onChange={(e) => dispatcher(setSearchString(e.target.value))}
         />
         <div className="flex items-center gap-2">
           {selectedTab ? (
@@ -281,6 +280,7 @@ function CartTop() {
                       {addProductModalIsOpen && (
                         <>
                           <Input
+                            ref={inputRef}
                             isClearable
                             radius="sm"
                             placeholder="Enter product link"
@@ -341,6 +341,7 @@ function CartTop() {
                             {customFields.map((field, index) => (
                               <div className="flex gap-2" key={index}>
                                 <Input
+                                  ref={inputRef}
                                   disabled
                                   radius="sm"
                                   placeholder="Key"
@@ -372,14 +373,14 @@ function CartTop() {
                       {filterModalIsOpen && (
                         <>
                           <div className="flex max-h-[50vh] flex-col gap-3 overflow-auto">
-                            {cols.map((col) => {
+                            {Cols.map((col) => {
                               if (col.type === "number") {
                                 return (
                                   <div
                                     className="flex flex-col gap-1"
                                     key={col.colId}
                                   >
-                                    <p className="px-1 text-sm text-textColorLight">{`${col.name}: In cart [${col.range[0]} to ${col.range[1]}]`}</p>
+                                    <p className="px-1 text-sm text-textColorLight">{`${col.name}: In cart [${col.range[0].value} to ${col.range[1].value}]`}</p>
                                     <div className="flex gap-2">
                                       <Input
                                         type="number"
@@ -414,7 +415,8 @@ function CartTop() {
                                             col.listId + "_" + col.colId
                                           ]?.to || ""
                                         }
-                                        onChange={(e) =>
+                                        onChange={(e) => {
+                                          console.log(e.target.value);
                                           handleFilterChange(
                                             col.colId,
                                             col.listId,
@@ -426,6 +428,7 @@ function CartTop() {
                                             },
                                           )
                                         }
+                                      }
                                       />
                                     </div>
                                   </div>
@@ -461,10 +464,10 @@ function CartTop() {
                                       >
                                         {col.range.map((option) => (
                                           <SelectItem
-                                            key={`${col.colId}-${option}`}
-                                            value={option}
+                                            key={`${col.colId}-${option.value}`}
+                                            value={option.value}
                                           >
-                                            {option}
+                                            {option.value}
                                           </SelectItem>
                                         ))}
                                       </Select>
@@ -490,6 +493,7 @@ function CartTop() {
                                     <p className="px-1 text-sm text-textColorLight">{`${col.name}`}</p>
                                     <div className="flex gap-2">
                                       <Input
+                                        ref={inputRef}
                                         type="number"
                                         onWheel={(e) => e.preventDefault()}
                                         radius="sm"
@@ -546,18 +550,19 @@ function CartTop() {
                                               <div className="mt-2 flex max-h-[20vh] w-full flex-col gap-2 overflow-auto">
                                                 {col.range.map((option) => (
                                                   <Input
+                                                    ref={inputRef}
                                                     type="number"
                                                     onWheel={(e) =>
                                                       e.preventDefault()
                                                     }
                                                     radius="sm"
-                                                    label={option}
+                                                    label={option.value}
                                                     value={
                                                       utilityData[
                                                         col.listId +
                                                           "_" +
                                                           col.colId
-                                                      ]?.ulility?.[option] || ""
+                                                      ]?.ulility?.[option.value] || ""
                                                     }
                                                     onChange={(e) =>
                                                       handleUtilityChange(
@@ -575,7 +580,7 @@ function CartTop() {
                                                                 "_" +
                                                                 col.colId
                                                             ]?.ulility,
-                                                            [option]:
+                                                            [option.value]:
                                                               e.target.value,
                                                           },
                                                         },
@@ -654,8 +659,6 @@ function CartTop() {
                         color="danger"
                         variant="flat"
                         onPress={() => {
-                          // TODO: Filter application logic should be added here
-                          console.log(filterData);
                           dispatcher(setFilterStateData(filterData));
                           onClose();
                         }}

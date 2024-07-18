@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BACKEND_URI, minPassLength, otpLength } from "@/CONSTANTS";
+import { BACKEND_URI, minPassLength, otpLength, RENDER_BACKEND_URI } from "@/CONSTANTS";
 import { ToastErrors, ToastInfo } from "./toastError";
 import Cookies from "js-cookie";
 
@@ -17,7 +17,7 @@ const handleLogin = async(isInvalid: boolean, password: string, email: string, s
                 email: email.trim(),
                 password: password,
             };
-            const loginRes = await axios.post(`${BACKEND_URI}/users/registerLogin`, user); 
+            const loginRes = await axios.post(`${RENDER_BACKEND_URI}/users/registerLogin`, user); 
             Cookies.set("avatarNumber", loginRes.data.data.user.avatarNumber, { expires: 60 * 60 * 24 * 30 });
             setOtpPage(true);
           } catch (error: any) {
@@ -43,7 +43,7 @@ const handleReset = async (otpGap: number, time: number, setTime: Function, setO
       email: Cookies.get("email") || "",
     };
     await axios.post(
-      `${BACKEND_URI}/users/resendOTP`,  
+      `${RENDER_BACKEND_URI}/users/resendOTP`,  
       body
     );
     ToastInfo("Email sent containing new otp!");
@@ -65,7 +65,7 @@ const handleGenerateNewPassword = async (email: string, setForgotPass: Function,
     const body = {
       "email": email
     }
-    await axios.post(`${BACKEND_URI}/users/generateNewPassword`, body);
+    await axios.post(`${RENDER_BACKEND_URI}/users/generateNewPassword`, body);
     ToastInfo("New password generated");
     setForgotPass(false);
     setOTP(false);

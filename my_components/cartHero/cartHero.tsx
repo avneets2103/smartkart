@@ -26,19 +26,26 @@ interface Product {
     brand: string;
     pricing: number;
     shipping_price: number;
-    availability_stock: Boolean,
-    average_rating: number,
-    total_reviews: number,
+    availability_stock: boolean;
+    average_rating: number;
+    total_reviews: number;
     extraFeatures: Record<string, string>;
-  }
+  };
 }
 
 interface Column {
   key: string;
   label: string;
+  listId: string;
+  type: "string" | "number";
+  utilityVal: number;
+  range: Array<{
+    value: string|number;
+    utility: number;
+  }>;
 }
 
-interface Row{
+interface Row {
   key: string;
   features: {
     images: Array<string>;
@@ -46,31 +53,41 @@ interface Row{
     brand: string;
     pricing: number;
     shipping_price: number;
-    availability_stock: Boolean,
-    average_rating: number,
-    total_reviews: number,
+    availability_stock: boolean;
+    average_rating: number;
+    total_reviews: number;
     [key: string]: any;
-  }
+  };
 }
 
-const tempRows: Array<Row> = [{
-  key: "1",
-  features: {
-    images: ["https://images.unsplash.com/photo-1617789853453-a4a7f6a9b3f0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"],
-    name: "Product 1",
-    brand: "Brand 1",
-    pricing: 100,
-    shipping_price: 100,
-    availability_stock: true,
-    average_rating: 4,
-    total_reviews: 10,
+const tempRows: Array<Row> = [
+  {
+    key: "1",
+    features: {
+      images: [
+        "https://images.unsplash.com/photo-1617789853453-a4a7f6a9b3f0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80",
+      ],
+      name: "Product 1",
+      brand: "Brand 1",
+      pricing: 100,
+      shipping_price: 100,
+      availability_stock: true,
+      average_rating: 4,
+      total_reviews: 10,
+    },
   },
-}];
+];
 
-const tempCols: Array<Column> = [{
-  key: "images",
-  label: "Images",
-}];
+const tempCols: Array<Column> = [
+  {
+    key: "images",
+    label: "Images",
+    listId: "1",
+    type: "string",
+    utilityVal: -1,
+    range: [],
+  },
+];
 
 function CartHero() {
   const [isLoading, setIsLoading] = useState(true);
@@ -79,9 +96,14 @@ function CartHero() {
   const currentList = useSelector((state: any) => state.sidebar.currentList);
   const cols: Array<Column> = useSelector((state: any) => state.cart.columns);
   const opts = useSelector((state: any) => state.cart.options);
-  const productData: Array<Product> = useSelector((state: any) => state.cart.productData);
+  const productData: Array<Product> = useSelector(
+    (state: any) => state.cart.productData
+  );
   const [Rows, setRows] = useState<Array<Row>>(tempRows);
+  const [searchRows, setSearchRows] = useState<Array<Row>>(tempRows);
   const [Cols, setCols] = useState<Array<Column>>(tempCols);
+  const searchValue = useSelector((state: any) => state.cart.searchString);
+  const filterData = useSelector((state: any) => state.cart.filterStateData);
 
   useEffect(() => {
     const loadCart = async () => {
@@ -95,7 +117,7 @@ function CartHero() {
       dispatcher(setColumns(cartRes.data.data.columns));
       dispatcher(setProductData(cartRes.data.data.products));
       dispatcher(setOptions(cartRes.data.data.options));
-      setIsLoading(false);  // Set loading to false after data is loaded
+      setIsLoading(false); // Set loading to false after data is loaded
     };
     if (currentList && currentList !== "") {
       loadCart();
@@ -118,17 +140,37 @@ function CartHero() {
           average_rating: product.features.average_rating,
           total_reviews: product.features.total_reviews,
         },
-      }
+      };
       Object?.keys(product.features.extraFeatures).forEach((key) => {
         newRow.features[key] = product.features.extraFeatures[key];
       });
       newRows.push(newRow);
     });
     setRows(newRows);
+    setSearchRows(newRows);
   }, [productData]);
 
+  useEffect(() => {
+    const filteredRows = searchRows.filter((row) => {
+      return Cols.some((col) => {
+        const value = row.features[col.key];
+        if (value == null) return false;
+        return value.toString().toLowerCase().includes(searchValue.toLowerCase());
+      });
+    });
+    setRows(filteredRows);
+  }, [searchValue]);
+
+  useEffect(()=>{
+    console.log("filterData", filterData);
+    const filteredRows = searchRows.filter((row) => {
+      
+    });
+    setRows(filteredRows);
+  }, [filterData])
+
   const netPrice = () => {
-    let totalPrice:number = 0;
+    let totalPrice: number = 0;
     productData.forEach((row) => {
       totalPrice += row.features.pricing;
     });
@@ -160,18 +202,18 @@ function CartHero() {
 
   const tableCellImage = (item: string | number | boolean, columnKey: string) => {
     if (columnKey !== "images") {
-      if(typeof item === "string"){
+      if (typeof item === "string") {
         if (item && item?.length > 50) return item.substring(0, 50) + "...";
         return item;
       }
-      if(typeof item === "boolean"){
+      if (typeof item === "boolean") {
         return item ? "In Stock" : "Out of Stock";
       }
-      if(typeof item === "number"){
+      if (typeof item === "number") {
         return item;
       }
     }
-    if(typeof item === "string"){
+    if (typeof item === "string") {
       return (
         <div className="flex items-center">
           <Image
@@ -187,8 +229,8 @@ function CartHero() {
   };
 
   const getColKey = (column: Column) => {
-    if(!column) return "";
-    if(column){
+    if (!column) return "";
+    if (column) {
       return column?.key;
     }
     return "";
@@ -196,56 +238,70 @@ function CartHero() {
 
   return (
     <div className="flex flex-col">
-      {!isLoading && Cols.length > 0 ? (  // Add this condition
-      <>
-        <Table
-          isStriped
-          isHeaderSticky
-          aria-label="Example table with infinite pagination"
-          baseRef={scrollerRef}
-          bottomContent={
-            hasMore ? (
-              <div className="flex w-full justify-center">
-                <Spinner ref={loaderRef} color="white" />
-              </div>
-            ) : null
-          }
-          classNames={{
-            base: "max-h-[73vh] overflow-scroll overflow-x-hidden max-w-[92vw]",
-            table: "",
-          }}
-        >
-          <TableHeader columns={Cols}>
-            {(column: Column) => (
-              <TableColumn className="min-w-[8rem]" key={getColKey(column) || ""}>
-                {column?.label}
-              </TableColumn>
-            )}
-          </TableHeader>
-          <TableBody items={Rows}>
-            {(item) => {
-              if(Cols.length === 0) return <></>;
-              return (
-              <TableRow key={item?.key || ""} className="p-4">
-                {(columnKey) => (
-                  <TableCell>
-                    <div>{tableCellImage(getKeyValue(item.features, columnKey), columnKey.toString())}</div>
-                  </TableCell>
-                )}
-              </TableRow>
-            )}}
-          </TableBody>
-        </Table>
-        <div className="flex h-[13vh] items-center justify-end gap-2">
-          <div
-            className="h-[60%] flex items-center justify-center rounded-md px-8 py-[0.4rem] text-textColorLight font-semibold cursor-pointer" onClick={() => {}}>
+      {!isLoading && Cols.length > 0 ? ( // Add this condition
+        <>
+          <Table
+            isStriped
+            isHeaderSticky
+            aria-label="Example table with infinite pagination"
+            baseRef={scrollerRef}
+            bottomContent={
+              hasMore ? (
+                <div className="flex w-full justify-center">
+                  <Spinner ref={loaderRef} color="white" />
+                </div>
+              ) : null
+            }
+            classNames={{
+              base: "max-h-[73vh] overflow-scroll overflow-x-hidden max-w-[92vw]",
+              table: "",
+            }}
+          >
+            <TableHeader columns={Cols}>
+              {(column: Column) => (
+                <TableColumn
+                  className="min-w-[8rem]"
+                  key={getColKey(column) || ""}
+                >
+                  {column?.label}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody items={Rows}>
+              {(item) => {
+                if (Cols.length === 0) return <></>;
+                return (
+                  <TableRow key={item?.key || ""} className="p-4">
+                    {(columnKey) => (
+                      <TableCell>
+                        <div>
+                          {tableCellImage(
+                            getKeyValue(item.features, columnKey),
+                            columnKey.toString()
+                          )}
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              }}
+            </TableBody>
+          </Table>
+          <div className="flex h-[13vh] items-center justify-end gap-2">
+            <div
+              className="h-[60%] flex items-center justify-center rounded-md px-8 py-[0.4rem] text-textColorLight font-semibold cursor-pointer"
+              onClick={() => {}}
+            >
               Edit List
-          </div>
-          <div className="h-[60%] flex items-center justify-center rounded-md bg-secondaryColor px-8 py-[0.4rem] text-primaryColor font-semibold cursor-pointer" onClick={() => {}}>
+            </div>
+            <div
+              className="h-[60%] flex items-center justify-center rounded-md bg-secondaryColor px-8 py-[0.4rem] text-primaryColor font-semibold cursor-pointer"
+              onClick={() => {}}
+            >
               {netPrice()}
+            </div>
           </div>
-        </div>
-      </>
+        </>
       ) : (
         <div className="flex h-[70vh] w-full items-center justify-center">
           <Spinner color="danger" />
