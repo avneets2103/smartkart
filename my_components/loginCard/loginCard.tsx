@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef, KeyboardEvent, useEffect } from 'react';
 import { Input } from "@nextui-org/react";
-import { BACKEND_URI, minPassLength, otpGap, otpLength } from '@/CONSTANTS';
+import { BACKEND_URI, minPassLength, otpGap, otpLength, RENDER_BACKEND_URI } from '@/CONSTANTS';
 import OtpInput from "react-otp-input";
 import Link from 'next/link';
 import Cookies from "js-cookie";
@@ -93,7 +93,7 @@ function LoginCard() {
             }
             try {
                 const res = await axios.post(
-                    `${BACKEND_URI}/users/verifyOTP`, 
+                    `${RENDER_BACKEND_URI}/users/verifyOTP`, 
                     verifyBody
                 );
                 tokenCookies(res.data.data.accessToken, res.data.data.refreshToken);
