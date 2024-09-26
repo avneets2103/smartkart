@@ -24,7 +24,7 @@ import { Select, SelectItem } from "@nextui-org/react";
 import { Popover, PopoverTrigger, PopoverContent } from "@nextui-org/popover";
 import axios from "@/utils/axios";
 import { BACKEND_URI, RENDER_BACKEND_URI } from "@/CONSTANTS";
-import { ToastErrors, ToastInfo } from "@/Helpers/toastError";
+import { ToastErrors, ToastInfo } from "@/Helpers/toastError"; 
 import { CircularProgress } from "@nextui-org/react";
 import usePreventScroll from '@/Helpers/stopScrollingInput';
 
